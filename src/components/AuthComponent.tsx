@@ -1,27 +1,56 @@
-﻿import React, { useState } from 'react';
-import { Box, TextField, Button, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, TextField, Button, Typography, Alert } from '@mui/material';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
+import { handleSignin } from './api/Auth';
+import { useNavigate } from 'react-router-dom';
 
 const SigninComponent = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showSignupForm, setShowSignupForm] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleAuth = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    try {
+      const apiPath = showSignupForm ? '/signup' : '/signin';
+      const result = await handleSignin({ e, email, password, apiPath });
+      setError(null);
+      const token = result?.data?.token;
+      if (token) {
+        localStorage.setItem('authToken', token);
+        navigate('/dashboard');
+      }
+      console.log('Signed in', result);
+    } catch (err: any) {
+      const msg = err?.message || 'Signin failed';
+      setError(msg);
+      console.error('Signin error', err);
+    }
+  };
 
   return (
     <Box
-      sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: 2,
+      }}
     >
       <Box
         sx={{
-          position: 'absolute',
-          top: 70,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          mb: 2,
         }}
       >
-        <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary' }}>
-          <SavingsOutlinedIcon fontSize="large" sx={{ mr: 1 }} />
+        <Typography variant="h4" className="logo" sx={{ fontWeight: 700, color: 'text.primary' }}>
+          <SavingsOutlinedIcon fontSize="large" />
           FinanceFlow
         </Typography>
       </Box>
@@ -30,6 +59,7 @@ const SigninComponent = () => {
         sx={{
           width: 500,
           p: 4,
+          pt: 6,
           borderRadius: 3,
           border: '1px solid rgba(255,255,255,0.04)',
           boxShadow: '0 8px 30px rgba(2,6,23,0.6)',
@@ -37,7 +67,7 @@ const SigninComponent = () => {
         }}
       >
         <Typography variant="h5" align="center" sx={{ mb: 1 }}>
-          Welcome Back
+          {showSignupForm ? 'Create Account' : 'Welcome Back'}
         </Typography>
 
         <Typography
@@ -45,7 +75,9 @@ const SigninComponent = () => {
           align="center"
           sx={{ mb: 2, display: 'block', color: 'text.secondary' }}
         >
-          Sign in to access your finance dashboard
+          {showSignupForm
+            ? 'Start tracking your finances today'
+            : 'Sign in to access your finance dashboard'}
         </Typography>
 
         <Box
@@ -65,7 +97,7 @@ const SigninComponent = () => {
 
           <TextField
             label="Password"
-            type={showPassword ? 'text' : 'password'}
+            type="password"
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             fullWidth
@@ -76,6 +108,7 @@ const SigninComponent = () => {
             variant="contained"
             color="primary"
             type="submit"
+            disabled={!email.trim() || !password}
             fullWidth
             sx={{
               py: 1.5,
@@ -84,10 +117,10 @@ const SigninComponent = () => {
               fontWeight: 500,
               fontSize: '18px',
             }}
+            onClick={handleAuth}
           >
             Sign In
           </Button>
-
           <Typography
             variant="body1"
             align="center"
@@ -98,9 +131,16 @@ const SigninComponent = () => {
               transition: 'color 150ms',
               '&:hover': { color: 'text.primary' },
             }}
+            onClick={() => setShowSignupForm((prev) => !prev)}
           >
-            Don't have an account? Sign up
+            {showSignupForm ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </Typography>
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
         </Box>
       </Box>
     </Box>

@@ -1,13 +1,23 @@
 import React from 'react';
-import SignupComponent from './components/Authorization/SignupComponent';
-import SigninComponent from './components/Authorization/SigninComponent';
+import './App.css';
+import { Routes, Route } from 'react-router-dom';
+import AuthComponent from './components/AuthComponent';
+import DashboardComponent from './components/DashboardComponent';
+import RequireAuth from './components/RequireAuth';
 
 const App = () => {
   return (
-    <div className="App">
-      {/* <SignupComponent /> */}
-      <SigninComponent />
-    </div>
+    <Routes>
+      <Route path="/" element={<AuthComponent />} />
+      <Route
+        path="/dashboard"
+        element={
+          <RequireAuth>
+            <DashboardComponent />
+          </RequireAuth>
+        }
+      />
+    </Routes>
   );
 };
 
