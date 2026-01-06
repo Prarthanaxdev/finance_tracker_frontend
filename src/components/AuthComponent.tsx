@@ -3,31 +3,106 @@ import { Box, TextField, Button, Typography, Alert } from '@mui/material';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import { handleSignin } from './api/Auth';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { login } from '../reducers/authSlice';
+import { EMAIL_VALIDATION, PASSWORD_REQUIREMENTS } from './utils/common';
 
 const SigninComponent = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [showSignupForm, setShowSignupForm] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [validationErrors, setValidationErrors] = useState<{
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // Email validation
+  const isValidEmail = (email: string): boolean => {
+    return EMAIL_VALIDATION.test(email);
+  };
+
+  // Password strength validation
+  const getPasswordStrength = (password: string): {
+    isValid: boolean;
+    message: string;
+  } => {
+    if (password.length < PASSWORD_REQUIREMENTS.minLength) {
+      return { isValid: false, message: 'Password must be at least 8 characters' };
+    }
+    if (!PASSWORD_REQUIREMENTS.hasUppercase.test(password)) {
+      return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+    }
+    if (!PASSWORD_REQUIREMENTS.hasLowercase.test(password)) {
+      return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+    }
+    if (!PASSWORD_REQUIREMENTS.hasNumber.test(password)) {
+      return { isValid: false, message: 'Password must contain at least one number' };
+    }
+    return { isValid: true, message: 'Password is strong' };
+  };
+
+  // Validate form
+  const validateForm = (): boolean => {
+    const errors: typeof validationErrors = {};
+
+    if (!isValidEmail(email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    const passwordStrength = getPasswordStrength(password);
+    if (!passwordStrength.isValid) {
+      errors.password = passwordStrength.message;
+    }
+
+    if (showSignupForm && password !== confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleAuth = async (e?: React.FormEvent) => {
     e?.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
     try {
       const apiPath = showSignupForm ? '/signup' : '/signin';
       const result = await handleSignin({ e, email, password, apiPath });
       setError(null);
       const token = result?.data?.token;
       if (token) {
+        dispatch(login(result.data));
         localStorage.setItem('authToken', token);
         navigate('/dashboard');
       }
-      console.log('Signed in', result);
     } catch (err: any) {
-      const msg = err?.message || 'Signin failed';
+      const msg = getErrorMessage(err);
       setError(msg);
-      console.error('Signin error', err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const getErrorMessage = (error: any): string => {
+    return error?.message || 'An error occurred. Please try again.';
+  };
+
+  const toggleSignupForm = () => {
+    setShowSignupForm((prev) => !prev);
+    setValidationErrors({});
+    setError(null);
+    setConfirmPassword('');
   };
 
   return (
@@ -57,9 +132,10 @@ const SigninComponent = () => {
 
       <Box
         sx={{
-          width: 500,
-          p: 4,
-          pt: 6,
+          width: { xs: '90%', sm: '80%', md: 500 },
+          maxWidth: 500,
+          p: { xs: 3, md: 4 },
+          pt: { xs: 4, md: 6 },
           borderRadius: 3,
           border: '1px solid rgba(255,255,255,0.04)',
           boxShadow: '0 8px 30px rgba(2,6,23,0.6)',
@@ -90,8 +166,13 @@ const SigninComponent = () => {
             label="Email"
             type="email"
             value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setEmail(e.target.value);
+              setValidationErrors({ ...validationErrors, email: undefined });
+            }}
             fullWidth
+            error={!!validationErrors.email}
+            helperText={validationErrors.email}
             sx={{ mb: 2 }}
           />
 
@@ -99,27 +180,48 @@ const SigninComponent = () => {
             label="Password"
             type="password"
             value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setPassword(e.target.value);
+              setValidationErrors({ ...validationErrors, password: undefined });
+            }}
             fullWidth
+            error={!!validationErrors.password}
+            helperText={validationErrors.password}
             sx={{ mb: 2 }}
           />
+
+          {showSignupForm && (
+            <TextField
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setConfirmPassword(e.target.value);
+                setValidationErrors({ ...validationErrors, confirmPassword: undefined });
+              }}
+              fullWidth
+              error={!!validationErrors.confirmPassword}
+              helperText={validationErrors.confirmPassword}
+              sx={{ mb: 2 }}
+            />
+          )}
 
           <Button
             variant="contained"
             color="primary"
             type="submit"
-            disabled={!email.trim() || !password}
+            disabled={!email.trim() || !password || (showSignupForm && !confirmPassword) || loading}
             fullWidth
             sx={{
-              py: 1.5,
+              py: { xs: 1.2, md: 1.5 },
               borderRadius: 3,
               boxShadow: '0 14px 30px rgba(18,196,139,0.18)',
               fontWeight: 500,
-              fontSize: '18px',
+              fontSize: { xs: '16px', md: '18px' },
             }}
             onClick={handleAuth}
           >
-            Sign In
+            {loading ? 'Loading...' : 'Sign In'}
           </Button>
           <Typography
             variant="body1"
@@ -131,7 +233,7 @@ const SigninComponent = () => {
               transition: 'color 150ms',
               '&:hover': { color: 'text.primary' },
             }}
-            onClick={() => setShowSignupForm((prev) => !prev)}
+            onClick={toggleSignupForm}
           >
             {showSignupForm ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </Typography>

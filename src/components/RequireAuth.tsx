@@ -1,14 +1,15 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const RequireAuth = ({ children }: Props) => {
-  const token = localStorage.getItem('authToken');
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
 
-  if (!token) {
+  if (!isAuthenticated) {
     // redirect to sign-in page
     return <Navigate to="/" replace />;
   }

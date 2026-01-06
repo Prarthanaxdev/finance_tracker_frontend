@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { BASE_URL } from '../utils/common';
+import { fetchWithTimeout } from '../utils/apiClient';
 
 export interface LoginResult {
   token: string;
@@ -11,23 +12,29 @@ export async function signIn(
   password: string,
   apiPath: string,
 ): Promise<LoginResult> {
-  const res = await fetch(`${BASE_URL}/api${apiPath}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
+  try {
+    const res = await fetchWithTimeout(`${BASE_URL}/api${apiPath}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-  if (!res.ok) {
-    let errBody: any;
-    try {
-      errBody = await res.json();
-    } catch {
-      errBody = await res.text();
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('Invalid email or password');
     }
-    throw new Error(errBody?.message || res.statusText || 'Login failed');
-  }
 
-  return (await res.json()) as LoginResult;
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({ message: res.statusText }));
+      throw new Error(errBody?.message || 'Login failed');
+    }
+
+    return (await res.json()) as LoginResult;
+  } catch (error: any) {
+    if (error instanceof TypeError) {
+      throw new Error('Network error. Check your connection.');
+    }
+    throw error;
+  }
 }
 
 export async function handleSignin(params: {
