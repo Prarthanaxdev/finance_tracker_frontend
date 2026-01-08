@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography, Alert } from '@mui/material';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
-import { handleSignin } from './api/Auth';
+import { handleSignin } from '../api/Auth';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from '../reducers/authSlice';
-import { EMAIL_VALIDATION, PASSWORD_REQUIREMENTS } from './utils/common';
+import { EMAIL_VALIDATION, PASSWORD_REQUIREMENTS } from '../utils/common';
 
 const SigninComponent = () => {
   const [email, setEmail] = useState<string>('');
@@ -47,7 +47,6 @@ const SigninComponent = () => {
     return { isValid: true, message: 'Password is strong' };
   };
 
-  // Validate form
   const validateForm = (): boolean => {
     const errors: typeof validationErrors = {};
 
@@ -82,8 +81,12 @@ const SigninComponent = () => {
       setError(null);
       const token = result?.data?.token;
       if (token) {
-        dispatch(login(result.data));
+        // Save both token and user data to localStorage
         localStorage.setItem('authToken', token);
+        localStorage.setItem('authUser', JSON.stringify(result.data));
+
+        // Dispatch login action with full user data
+        dispatch(login(result.data));
         navigate('/dashboard');
       }
     } catch (err: any) {

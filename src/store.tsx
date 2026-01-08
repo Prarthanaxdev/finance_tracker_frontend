@@ -8,6 +8,11 @@ export const store = configureStore({
   devTools: true,
 })
 
+// Persist auth state to localStorage on every state change
 store.subscribe(() => {
-  console.log('State updated:', store.getState());
+  const state = store.getState();
+  if (state.auth.isAuthenticated && state.auth.user) {
+    localStorage.setItem('authToken', state.auth.user.token || '');
+    localStorage.setItem('authUser', JSON.stringify(state.auth.user));
+  }
 });

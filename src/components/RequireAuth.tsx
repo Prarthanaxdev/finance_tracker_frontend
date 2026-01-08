@@ -8,11 +8,11 @@ interface Props {
 
 const RequireAuth = ({ children }: Props) => {
   const { isAuthenticated } = useSelector((state: any) => state.auth);
+  const token = localStorage.getItem('authToken');
 
-  if (!isAuthenticated) {
-    // redirect to sign-in page
-    return <Navigate to="/" replace />;
-  }
+  if (!isAuthenticated && token) return null;
+
+  if (!isAuthenticated) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 };

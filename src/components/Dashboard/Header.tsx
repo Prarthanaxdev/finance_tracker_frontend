@@ -2,21 +2,21 @@ import { Box, Button, Typography, Alert } from '@mui/material';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
-import {logout} from '../reducers/authSlice';
+import {logout} from '../../reducers/authSlice';
 import { useDispatch } from 'react-redux';
 
-const DashboardComponent = () => {
+const HeaderComponent = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleSignOut = () => {
     dispatch(logout());
     localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
     navigate('/');
   };
-
   return (
-    <Box sx={{
+   <Box sx={{
       p: { xs: 1, md: 2 },
       backgroundColor: 'background.paper',
       minHeight: '85px',
@@ -40,6 +40,5 @@ const DashboardComponent = () => {
       </Button>
     </Box>
   );
-};
-
-export default DashboardComponent;
+}
+export default HeaderComponent;

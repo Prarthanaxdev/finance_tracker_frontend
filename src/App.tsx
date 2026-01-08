@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import AuthComponent from './components/AuthComponent';
-import DashboardComponent from './components/DashboardComponent';
+import DashboardComponent from './components/Dashboard/Dashboard';
 import RequireAuth from './components/RequireAuth';
 import AppInitializer from './AppInitializer';
 import './App.css';
