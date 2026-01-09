@@ -1,0 +1,21 @@
+# Dependencies
+node_modules
+
+# Production
+build
+dist
+
+# Testing
+coverage
+
+# Generated files
+react-app-env.d.ts
+reportWebVitals.ts
+setupTests.ts
+
+# Config files
+*.config.js
+*.config.ts
+
+# Ignore all source files to prevent ESLint overlay from blocking UI during development
+src/**

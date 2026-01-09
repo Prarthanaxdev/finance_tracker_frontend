@@ -1,9 +1,8 @@
-const API_TIMEOUT = 10000; // 10 seconds
+import { config } from '../config/env';
 
-export async function fetchWithTimeout(
-  url: string,
-  options: RequestInit = {},
-): Promise<Response> {
+const API_TIMEOUT = config.apiTimeout;
+
+export async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 

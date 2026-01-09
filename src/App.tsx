@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
-import AuthComponent from './components/AuthComponent';
+import AuthComponent from './components/Auth/AuthComponent';
 import DashboardComponent from './components/Dashboard/Dashboard';
-import RequireAuth from './components/RequireAuth';
+import RequireAuth from './components/Auth/RequireAuth';
 import AppInitializer from './AppInitializer';
 import './App.css';
 
@@ -11,15 +11,15 @@ const App = () => {
       <AppInitializer />
       <Routes>
         <Route path="/" element={<AuthComponent />} />
-      <Route
-        path="/dashboard"
-        element={
-          <RequireAuth>
-            <DashboardComponent />
-          </RequireAuth>
-        }
-      />
-    </Routes>
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <DashboardComponent />
+            </RequireAuth>
+          }
+        />
+      </Routes>
     </>
   );
 };

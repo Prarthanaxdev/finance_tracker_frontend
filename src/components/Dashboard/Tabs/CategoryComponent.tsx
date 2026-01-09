@@ -13,7 +13,7 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import { addCategory } from '../../../api/addCategory';
@@ -45,7 +45,7 @@ const CategoryComponent = () => {
   const [formData, setFormData] = useState({
     name: '',
     type: 'expense' as 'income' | 'expense',
-    description: ''
+    description: '',
   });
 
   const token = getAuthToken();
@@ -78,15 +78,15 @@ const CategoryComponent = () => {
       const result = await getCategory(
         token as string,
         paginationModel.pageSize,
-        paginationModel.page * paginationModel.pageSize,
+        paginationModel.page * paginationModel.pageSize
       );
       const dataArray = Array.isArray(result)
         ? result
         : Array.isArray((result as any)?.data?.categories)
-        ? (result as any).data.categories
-        : Array.isArray((result as any)?.data)
-        ? (result as any).data
-        : [];
+          ? (result as any).data.categories
+          : Array.isArray((result as any)?.data)
+            ? (result as any).data
+            : [];
 
       const mapped: CategoryRow[] = dataArray.map((c: any) => ({
         id: c._id || c.id,
@@ -117,14 +117,18 @@ const CategoryComponent = () => {
       try {
         setLoading(true);
         setError(null);
-        const result = await getCategory(token, paginationModel.pageSize, paginationModel.page * paginationModel.pageSize);
+        const result = await getCategory(
+          token,
+          paginationModel.pageSize,
+          paginationModel.page * paginationModel.pageSize
+        );
         const dataArray = Array.isArray(result)
           ? result
           : Array.isArray((result as any)?.data?.categories)
-          ? (result as any).data.categories
-          : Array.isArray((result as any)?.data)
-          ? (result as any).data
-          : [];
+            ? (result as any).data.categories
+            : Array.isArray((result as any)?.data)
+              ? (result as any).data
+              : [];
 
         const mapped: CategoryRow[] = dataArray.map((c: any) => ({
           id: c._id || c.id || `${c.name || 'row'}-${Math.random().toString(36).slice(2)}`,
@@ -149,7 +153,9 @@ const CategoryComponent = () => {
   return (
     <div className="tab-content">
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" color="primary" onClick={() => setCategoryModal(true)}>Add Category</Button>
+        <Button variant="contained" color="primary" onClick={() => setCategoryModal(true)}>
+          Add Category
+        </Button>
       </Box>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -158,7 +164,9 @@ const CategoryComponent = () => {
       )}
       <Paper sx={{ height: 400, width: '100%', position: 'relative' }}>
         {loading ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
+          >
             <CircularProgress />
           </Box>
         ) : (
@@ -175,22 +183,20 @@ const CategoryComponent = () => {
           />
         )}
       </Paper>
-      <Modal
-        open={categoryModal}
-        onClose={handleModalClose}
-        aria-labelledby="modal-title"
-      >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2
-        }}>
+      <Modal open={categoryModal} onClose={handleModalClose} aria-labelledby="modal-title">
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
           <Typography id="modal-title" variant="h6" component="h2" sx={{ mb: 3 }}>
             Add New Category
           </Typography>
@@ -213,7 +219,9 @@ const CategoryComponent = () => {
             <Select
               value={formData.type}
               label="Type"
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as 'income' | 'expense' })}
+              onChange={(e) =>
+                setFormData({ ...formData, type: e.target.value as 'income' | 'expense' })
+              }
             >
               <MenuItem value="income">Income</MenuItem>
               <MenuItem value="expense">Expense</MenuItem>
@@ -251,7 +259,6 @@ const CategoryComponent = () => {
           {successMessage}
         </Alert>
       </Snackbar>
-
     </div>
   );
 };

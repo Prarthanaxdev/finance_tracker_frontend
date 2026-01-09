@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 import App from './App';
 import theme from './theme';
 import reportWebVitals from './reportWebVitals';
-import { store } from './store';
+import { store } from './store/index';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
@@ -20,7 +20,7 @@ root.render(
         </ThemeProvider>
       </BrowserRouter>
     </Provider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

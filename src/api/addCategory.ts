@@ -1,4 +1,4 @@
-import { BASE_URL } from "../utils/common";
+import { apiClient } from '../utils/apiClientService';
 
 interface addCategoryResponse {
   name: string;
@@ -11,18 +11,9 @@ interface AddCategoryResult {
   message?: string;
 }
 
-export const addCategory = async (token: string, category: addCategoryResponse): Promise<AddCategoryResult> => {
-  const res = await fetch(`${BASE_URL}/api/categories`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(category),
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(text || 'Failed to add category');
-  }
-  return res.json();
+export const addCategory = async (
+  token: string,
+  category: addCategoryResponse
+): Promise<AddCategoryResult> => {
+  return apiClient.post<AddCategoryResult>('/api/categories', category, token);
 };

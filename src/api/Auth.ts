@@ -1,6 +1,5 @@
 import type { FormEvent } from 'react';
-import { BASE_URL } from '../utils/common';
-import { fetchWithTimeout } from '../utils/apiClient';
+import { apiClient } from '../utils/apiClientService';
 
 export interface LoginResult {
   token: string;
@@ -10,26 +9,14 @@ export interface LoginResult {
 export async function signIn(
   email: string,
   password: string,
-  apiPath: string,
+  apiPath: string
 ): Promise<LoginResult> {
   try {
-    const res = await fetchWithTimeout(`${BASE_URL}/api${apiPath}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (res.status === 401 || res.status === 403) {
+    return await apiClient.post<LoginResult>(`/api${apiPath}`, { email, password });
+  } catch (error: any) {
+    if (error.message.includes('401') || error.message.includes('403')) {
       throw new Error('Invalid email or password');
     }
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({ message: res.statusText }));
-      throw new Error(errBody?.message || 'Login failed');
-    }
-
-    return (await res.json()) as LoginResult;
-  } catch (error: any) {
     if (error instanceof TypeError) {
       throw new Error('Network error. Check your connection.');
     }

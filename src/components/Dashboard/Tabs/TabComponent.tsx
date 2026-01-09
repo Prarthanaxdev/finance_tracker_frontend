@@ -5,7 +5,7 @@ import CategoryComponent from './CategoryComponent';
 import IncomeComponent from './IncomeTab';
 
 interface TabConfig {
-  id: typeof TABS[number];
+  id: (typeof TABS)[number];
   label: string;
 }
 
@@ -24,9 +24,8 @@ const TAB_CONFIG: TabConfig[] = [
   },
 ];
 
-
 const TabComponent = () => {
-  const [activeTab, setActiveTab] = useState<typeof TABS[number]>('expenses');
+  const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>('expenses');
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -57,6 +56,6 @@ const TabComponent = () => {
       {renderTabContent()}
     </>
   );
-}
+};
 
 export default TabComponent;
