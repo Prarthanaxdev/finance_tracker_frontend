@@ -20,12 +20,12 @@ export function useTransactions() {
   const token = getAuthToken() || undefined;
 
   const loadTransactions = useCallback(
-    async (limit: number = 50, offset: number = 0, type?: TransactionType) => {
+    async (limit = 50, offset = 0, type?: TransactionType) => {
       setLoading(true);
       setError(null);
       try {
         const t = type ?? currentType;
-        if (t) setCurrentType(t);
+        if (t) {setCurrentType(t);}
         if (!token) {
           throw new Error('Not authenticated');
         }

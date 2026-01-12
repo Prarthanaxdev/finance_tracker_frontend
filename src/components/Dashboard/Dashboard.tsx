@@ -4,46 +4,39 @@ import HeaderComponent from './Header';
 import './Dashboard.css';
 import TabComponent from './Tabs/TabComponent';
 import ChartLayout from '../Charts/ChartLayout';
-import { getTransactions } from '../../api/getTransactions';
+import SummaryCards from './SummaryCards';
+import { getDashboardSummary } from '../../api/dashboardSummary';
 import { getAuthToken } from '../../utils/common';
+import { useAppSelector } from '../../store/hooks';
 
 const DashboardComponent = () => {
   const [incomeTotal, setIncomeTotal] = useState(0);
   const [expenseTotal, setExpenseTotal] = useState(0);
+  const refreshVersion = useAppSelector((state) => state.refreshVersion.refreshVersion);
 
   useEffect(() => {
-    const fetchTotals = async () => {
+    const fetchSummary = async () => {
       const token = getAuthToken();
       if (!token) return;
 
       try {
-        // Fetch income transactions
-        const incomeResult = await getTransactions(token, 1000, 0, 'income');
-        const incomeData = Array.isArray(incomeResult)
-          ? incomeResult
-          : incomeResult?.data?.transactions || [];
-        const incomeSum = incomeData.reduce((sum, t) => sum + (t.amount || 0), 0);
-        setIncomeTotal(incomeSum);
-
-        // Fetch expense transactions
-        const expenseResult = await getTransactions(token, 1000, 0, 'expense');
-        const expenseData = Array.isArray(expenseResult)
-          ? expenseResult
-          : expenseResult?.data?.transactions || [];
-        const expenseSum = expenseData.reduce((sum, t) => sum + (t.amount || 0), 0);
-        setExpenseTotal(expenseSum);
+        const result = await getDashboardSummary(token);
+        setIncomeTotal(result.data.income);
+        setExpenseTotal(result.data.expense);
       } catch (error) {
-        console.error('Failed to fetch transaction totals:', error);
+        console.error('Failed to fetch dashboard summary:', error);
       }
     };
 
-    fetchTotals();
-  }, []);
+    fetchSummary();
+  }, [refreshVersion]);
 
   return (
     <>
       <HeaderComponent />
       <Container maxWidth="xl" sx={{ mt: 3 }}>
+        <h1>Dashboard</h1>
+        <SummaryCards income={incomeTotal} expense={expenseTotal} />
         <ChartLayout />
         <TabComponent />
       </Container>

@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import { useDispatch } from "react-redux";
-import { incrementVersion } from "../../store/refreshSlice";
+import { incrementVersion } from "../../reducers/refreshSlice";
 interface TransactionRow {
   id: string;
   categoryId: string;

@@ -1,7 +1,6 @@
 import { Box, Paper, Typography } from "@mui/material";
 import ExpenseBreakdown from "./ExpenseBreakdown";
-import { useCallback } from "react";
-
+import MonthlySummary from "./MonthlySummary";
 interface ChartLayoutProps {
   onTransactionSaved?: () => void;
 }
@@ -67,7 +66,7 @@ const ChartLayout = ({ onTransactionSaved }: ChartLayoutProps) => {
             color: "#666",
           }}
         >
-          */ Will do on monday */
+          <MonthlySummary />
         </Box>
       </Paper>
     </Box>

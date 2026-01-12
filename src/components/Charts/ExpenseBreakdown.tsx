@@ -30,7 +30,7 @@ const ExpenseBreakdown = () => {
       }
     };
     loadData();
-  }, [refreshVersion]);
+  }, [refreshVersion]); // Re-fetch data when refreshVersion changes
 
   if (breakdown.length === 0) {
     return (

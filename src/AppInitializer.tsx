@@ -1,3 +1,8 @@
+/**
+ * AppInitializer component to restore authentication state from localStorage
+ * on application startup.
+ */
+
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from './reducers/authSlice';

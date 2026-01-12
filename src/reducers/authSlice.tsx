@@ -13,11 +13,13 @@ interface AuthState {
   user: AuthUser | null;
 }
 
+// Setting initial state
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
 };
 
+// Creating the auth slice
 export const authSlice = createSlice({
   name: 'auth',
   initialState,

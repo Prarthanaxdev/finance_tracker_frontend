@@ -1,19 +1,19 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 interface RefreshState {
-  version: number;
+  refreshVersion: number;
 }
 
 const initialState: RefreshState = {
-  version: 0,
+  refreshVersion: 0,
 };
 
-export const refreshSlice = createSlice({
-  name: "refreshVersion",
+const refreshSlice = createSlice({
+  name: 'refresh',
   initialState,
   reducers: {
     incrementVersion: (state) => {
-      state.version += 1;
+      state.refreshVersion += 1;
     },
   },
 });
