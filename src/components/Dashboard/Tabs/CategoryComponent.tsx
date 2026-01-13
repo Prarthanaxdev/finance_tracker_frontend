@@ -48,6 +48,8 @@ const CategoryComponent = () => {
     description: '',
   });
 
+  console.log('rows:', rows);
+
   const token = getAuthToken();
 
   const handleModalClose = () => {

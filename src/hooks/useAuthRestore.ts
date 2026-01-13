@@ -1,13 +1,11 @@
-/**
- * AppInitializer component to restore authentication state from localStorage
- * on application startup.
- */
-
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { login } from './reducers/authSlice';
+import { login } from '../reducers/authSlice';
 
-const AppInitializer = () => {
+/**
+ * Custom hook to restore authentication state from localStorage on app startup
+ */
+export const useAuthRestore = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -20,13 +18,10 @@ const AppInitializer = () => {
         dispatch(login(userData));
       } catch (error) {
         console.error('Failed to restore auth state:', error);
+        // Clean up corrupted data
         localStorage.removeItem('authToken');
         localStorage.removeItem('authUser');
       }
     }
   }, [dispatch]);
-
-  return null;
 };
-
-export default AppInitializer;

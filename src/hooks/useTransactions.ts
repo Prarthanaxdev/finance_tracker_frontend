@@ -12,7 +12,7 @@ export interface TransactionFormData {
 }
 
 export function useTransactions() {
-  const [transactions, setTransactions] = useState<TransactionApiItem[]>([]);
+  const [transactions, setTransactions] = useState<TransactionApiItem[] | { total: number; limit: number; offset: number; transactions: TransactionApiItem[]; }>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentType, setCurrentType] = useState<TransactionType | undefined>(undefined);
@@ -30,11 +30,11 @@ export function useTransactions() {
           throw new Error('Not authenticated');
         }
         const res = await getTransactions(token, limit, offset, t);
-        const list: TransactionApiItem[] = Array.isArray(res)
+        const data = Array.isArray(res)
           ? res
-          : (res as GetTransactionsResult).data?.transactions || [];
-        setTransactions(list || []);
-        return list;
+          : (res as GetTransactionsResult).data;
+        setTransactions(data || []);
+        return data;
       } catch (e: any) {
         const msg = e?.message || 'Failed to load transactions';
         setError(msg);

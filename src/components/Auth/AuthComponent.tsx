@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography, Alert } from "@mui/material";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
-import { useAuth } from "../../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Form, useActionData, useNavigation } from 'react-router-dom';
 import { EMAIL_VALIDATION, PASSWORD_REQUIREMENTS } from "../../utils/common";
+import { AuthActionData } from '../../router/loaders';
 
 const SigninComponent = () => {
   const [email, setEmail] = useState<string>("");
@@ -15,8 +15,9 @@ const SigninComponent = () => {
     password?: string;
     confirmPassword?: string;
   }>({});
-  const navigate = useNavigate();
-  const { loading, error, signIn } = useAuth();
+  
+  const actionData = useActionData() as AuthActionData;
+  const navigation = useNavigation();
 
   // Email validation
   const isValidEmail = (email: string): boolean => {
@@ -75,25 +76,6 @@ const SigninComponent = () => {
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
-  };
-
-  const handleAuth = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      const result = await signIn({
-        email,
-        password,
-        isSignup: showSignupForm,
-      });
-      if (result?.token) navigate("/dashboard");
-    } catch (err: any) {
-      console.error("Authentication error:", err);
-    }
   };
 
   const toggleSignupForm = () => {
@@ -157,15 +139,21 @@ const SigninComponent = () => {
             : "Sign in to access your finance dashboard"}
         </Typography>
 
-        <Box
-          component="form"
-          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-          noValidate
-          autoComplete="off"
+        <Form
+          method="post"
+          style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+          onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+            if (!validateForm()) {
+              e.preventDefault();
+              return;
+            }
+          }}
         >
+          <input type="hidden" name="intent" value={showSignupForm ? "register" : "login"} />
           <TextField
             label="Email"
             type="email"
+            name="email"
             value={email}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setEmail(e.target.value);
@@ -183,6 +171,7 @@ const SigninComponent = () => {
           <TextField
             label="Password"
             type="password"
+            name="password"
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setPassword(e.target.value);
@@ -201,6 +190,7 @@ const SigninComponent = () => {
             <TextField
               label="Confirm Password"
               type="password"
+              name="confirmPassword"
               value={confirmPassword}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setConfirmPassword(e.target.value);
@@ -224,7 +214,7 @@ const SigninComponent = () => {
               !email.trim() ||
               !password ||
               (showSignupForm && !confirmPassword) ||
-              loading
+              navigation.state === "submitting"
             }
             fullWidth
             sx={{
@@ -234,9 +224,8 @@ const SigninComponent = () => {
               fontWeight: 500,
               fontSize: { xs: "16px", md: "18px" },
             }}
-            onClick={handleAuth}
           >
-            {loading ? "Loading..." : "Sign In"}
+            {navigation.state === "submitting" ? "Loading..." : showSignupForm ? "Sign Up" : "Sign In"}
           </Button>
           <Typography
             variant="body1"
@@ -255,12 +244,12 @@ const SigninComponent = () => {
               : "Don't have an account? Sign up"}
           </Typography>
 
-          {error && (
+          {actionData?.error && (
             <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
+              {actionData.error}
             </Alert>
           )}
-        </Box>
+        </Form>
       </Box>
     </Box>
   );

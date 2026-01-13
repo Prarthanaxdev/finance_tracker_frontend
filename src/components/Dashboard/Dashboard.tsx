@@ -1,35 +1,29 @@
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import { Container } from '@mui/material';
+import { useLoaderData } from 'react-router-dom';
 import HeaderComponent from './Header';
-import './Dashboard.css';
+import './Dashboard.scss';
 const TabComponent = lazy(() => import('./Tabs/TabComponent'));
 const ChartLayout = lazy(() => import('../Charts/ChartLayout'));
 const SummaryCards = lazy(() => import('./SummaryCards'));
-import { getDashboardSummary } from '../../api/dashboardSummary';
-import { getAuthToken } from '../../utils/common';
-import { useAppSelector } from '../../store/hooks';
 
 const DashboardComponent = () => {
-  const [incomeTotal, setIncomeTotal] = useState(0);
-  const [expenseTotal, setExpenseTotal] = useState(0);
-  const refreshVersion = useAppSelector((state) => state.refreshVersion.refreshVersion);
+  const { summary, monthlyTrends, categoryBreakdown } = useLoaderData() as {
+    summary: { data: { income: number; expense: number } };
+    monthlyTrends: any;
+    categoryBreakdown: any;
+  };
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      const token = getAuthToken();
-      if (!token) return;
+  console.log('Dashboard data:', { summary, monthlyTrends, categoryBreakdown });
 
-      try {
-        const result = await getDashboardSummary(token);
-        setIncomeTotal(result.data.income);
-        setExpenseTotal(result.data.expense);
-      } catch (error) {
-        console.error('Failed to fetch dashboard summary:', error);
-      }
-    };
-
-    fetchSummary();
-  }, [refreshVersion]);
+  if (!summary || !summary.data) {
+    return (
+      <Container maxWidth="xl" sx={{ mt: 3 }}>
+        <h1>Dashboard</h1>
+        <div>Loading dashboard data...</div>
+      </Container>
+    );
+  }
 
   return (
     <>
@@ -37,7 +31,7 @@ const DashboardComponent = () => {
       <Container maxWidth="xl" sx={{ mt: 3 }}>
         <h1>Dashboard</h1>
         <Suspense fallback={<div>Loading dashboard widgets...</div>}>
-          <SummaryCards income={incomeTotal} expense={expenseTotal} />
+          <SummaryCards income={summary.data.income} expense={summary.data.expense} />
           <ChartLayout />
           <TabComponent />
         </Suspense>

@@ -120,9 +120,13 @@ const TransactionTable = ({ type }: TransactionTableProps) => {
   }, []);
 
   useEffect(() => {
-    const mapped = mapTransactions(transactions || []);
+    const transactionData = Array.isArray(transactions)
+      ? { transactions, total: transactions.length }
+      : transactions;
+
+    const mapped = mapTransactions(transactionData.transactions || []);
     setRows(mapped);
-    setRowCount(mapped.length);
+    setRowCount(transactionData.total || 0);
   }, [transactions]);
 
   const validateForm = () => {
@@ -252,7 +256,7 @@ const TransactionTable = ({ type }: TransactionTableProps) => {
           <DataGrid
             rows={rows}
             columns={columns}
-            getRowId={(row) => row.id}
+            getRowId={(row: any) => row.id}
             paginationMode="server"
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
@@ -293,7 +297,7 @@ const TransactionTable = ({ type }: TransactionTableProps) => {
             error={formErrors.amount}
             helperText={formErrors.amount ? "Amount is required" : ""}
             value={formData.amount}
-            onChange={(e) =>
+            onChange={(e: any) =>
               setFormData({ ...formData, amount: e.target.value })
             }
           />
@@ -305,7 +309,7 @@ const TransactionTable = ({ type }: TransactionTableProps) => {
             error={formErrors.description}
             helperText={formErrors.description ? "Description is required" : ""}
             value={formData.description}
-            onChange={(e) =>
+            onChange={(e: any) =>
               setFormData({ ...formData, description: e.target.value })
             }
           />
@@ -314,7 +318,7 @@ const TransactionTable = ({ type }: TransactionTableProps) => {
             <Select
               label="Category"
               value={formData.categoryId}
-              onChange={(e) =>
+              onChange={(e: any) =>
                 setFormData({ ...formData, categoryId: e.target.value })
               }
             >

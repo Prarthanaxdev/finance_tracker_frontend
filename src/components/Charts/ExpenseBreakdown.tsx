@@ -1,13 +1,13 @@
 import { Pie } from "react-chartjs-2";
 import { Box } from "@mui/material";
 import "../Charts/ChartSetup";
-import { useEffect, useState } from "react";
+import { useLoaderData, useRevalidator } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import {
   CategoryBreakdownItem,
-  getCategoryBreakdown,
 } from "../../api/getCategoryBreakdown";
-import { getAuthToken, CHART_COLORS, CHART_BORDER_COLORS } from "../../utils/common";
+import { CHART_COLORS, CHART_BORDER_COLORS } from "../../utils/common";
 
 interface CategoryExpense {
   name: string;
@@ -15,22 +15,22 @@ interface CategoryExpense {
 }
 
 const ExpenseBreakdown = () => {
-  const [breakdown, setBreakdown] = useState<CategoryBreakdownItem[]>([]);
+  const { categoryBreakdown } = useLoaderData() as {
+    categoryBreakdown: { data: CategoryBreakdownItem[] };
+  };
+  const revalidator = useRevalidator();
   const refreshVersion = useSelector((state: any) => state.refreshVersion.refreshVersion);
+  const prevRefreshVersionRef = useRef(refreshVersion);
 
+  // Revalidate loader data when refreshVersion changes
   useEffect(() => {
-    const loadData = async () => {
-      const token = getAuthToken();
-      if (!token) return;
-      try {
-        const res = await getCategoryBreakdown(token);
-        setBreakdown(res?.data ?? []);
-      } catch (err) {
-        setBreakdown([]);
-      }
-    };
-    loadData();
-  }, [refreshVersion]); // Re-fetch data when refreshVersion changes
+    if (refreshVersion !== prevRefreshVersionRef.current) {
+      prevRefreshVersionRef.current = refreshVersion;
+      revalidator.revalidate();
+    }
+  }, [refreshVersion, revalidator]);
+
+  const breakdown = categoryBreakdown?.data ?? [];
 
   if (breakdown.length === 0) {
     return (

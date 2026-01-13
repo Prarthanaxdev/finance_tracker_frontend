@@ -1,49 +1,15 @@
 import { Bar } from 'react-chartjs-2';
 import { Box, Typography } from '@mui/material';
 import '../Charts/ChartSetup';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { getMonthlyTrend, MonthlyTrendItem } from '../../api/getMonthlyTrend';
-import { getAuthToken } from '../../utils/common';
+import { useLoaderData } from 'react-router-dom';
+import { MonthlyTrendItem } from '../../api/getMonthlyTrend';
 
 const MonthlySummary = () => {
-  const [monthlyData, setMonthlyData] = useState<MonthlyTrendItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const refreshVersion = useSelector((state: any) => state.refreshVersion.refreshVersion);
+  const { monthlyTrends } = useLoaderData() as {
+    monthlyTrends: { data: MonthlyTrendItem[] };
+  };
 
-  useEffect(() => {
-    const loadData = async () => {
-      const token = getAuthToken();
-      if (!token) return;
-
-      setLoading(true);
-      try {
-        const currentYear = new Date().getFullYear();
-        const res = await getMonthlyTrend(token, currentYear);
-        setMonthlyData(res?.data ?? []);
-      } catch (err) {
-        setMonthlyData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [refreshVersion]);
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: 300,
-        }}
-      >
-        <span style={{ color: '#999' }}>Loading...</span>
-      </Box>
-    );
-  }
+  const monthlyData = monthlyTrends?.data ?? [];
 
   if (monthlyData.length === 0) {
     return (
