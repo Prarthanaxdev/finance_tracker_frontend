@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { Container } from '@mui/material';
 import HeaderComponent from './Header';
 import './Dashboard.css';
-import TabComponent from './Tabs/TabComponent';
-import ChartLayout from '../Charts/ChartLayout';
-import SummaryCards from './SummaryCards';
+const TabComponent = lazy(() => import('./Tabs/TabComponent'));
+const ChartLayout = lazy(() => import('../Charts/ChartLayout'));
+const SummaryCards = lazy(() => import('./SummaryCards'));
 import { getDashboardSummary } from '../../api/dashboardSummary';
 import { getAuthToken } from '../../utils/common';
 import { useAppSelector } from '../../store/hooks';
@@ -36,9 +36,11 @@ const DashboardComponent = () => {
       <HeaderComponent />
       <Container maxWidth="xl" sx={{ mt: 3 }}>
         <h1>Dashboard</h1>
-        <SummaryCards income={incomeTotal} expense={expenseTotal} />
-        <ChartLayout />
-        <TabComponent />
+        <Suspense fallback={<div>Loading dashboard widgets...</div>}>
+          <SummaryCards income={incomeTotal} expense={expenseTotal} />
+          <ChartLayout />
+          <TabComponent />
+        </Suspense>
       </Container>
     </>
   );

@@ -1,25 +1,29 @@
+import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import AuthComponent from './components/Auth/AuthComponent';
-import DashboardComponent from './components/Dashboard/Dashboard';
 import RequireAuth from './components/Auth/RequireAuth';
 import AppInitializer from './AppInitializer';
 import './App.css';
+
+const AuthComponent = lazy(() => import('./components/Auth/AuthComponent'));
+const DashboardComponent = lazy(() => import('./components/Dashboard/Dashboard'));
 
 const App = () => {
   return (
     <>
       <AppInitializer />
-      <Routes>
-        <Route path="/" element={<AuthComponent />} />
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <DashboardComponent />
-            </RequireAuth>
-          }
-        />
-      </Routes>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<AuthComponent />} />
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth>
+                <DashboardComponent />
+              </RequireAuth>
+            }
+          />
+        </Routes>
+      </Suspense>
     </>
   );
 };
