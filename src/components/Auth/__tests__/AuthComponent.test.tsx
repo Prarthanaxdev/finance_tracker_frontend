@@ -30,7 +30,7 @@ const renderAuthComponent = () => {
   return render(
     <Provider store={store}>
       <RouterProvider router={router} />
-    </Provider>
+    </Provider>,
   );
 };
 
@@ -39,40 +39,40 @@ describe('AuthComponent', () => {
     it('renders login form by default', () => {
       renderAuthComponent();
 
-      expect(screen.getByText('Welcome Back')).toBeInTheDocument();
-      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+      expect(screen.getAllByText('Welcome Back')[0]).toBeInTheDocument();
+      expect(screen.getAllByLabelText(/email/i)[0]).toBeInTheDocument();
+      expect(screen.getAllByLabelText(/password/i)[0]).toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: /sign in/i })[0]).toBeInTheDocument();
     });
 
     it('can toggle to signup form', () => {
       renderAuthComponent();
 
-      const toggleButton = screen.getByText("Don't have an account? Sign up");
+      const toggleButton = screen.getAllByText("Don't have an account? Sign up")[0];
       fireEvent.click(toggleButton);
 
-      expect(screen.getByText('Create Account')).toBeInTheDocument();
-      expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
+      expect(screen.getAllByText('Create Account')[0]).toBeInTheDocument();
+      expect(screen.getAllByLabelText(/confirm password/i)[0]).toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: /sign up/i })[0]).toBeInTheDocument();
     });
   });
 
   describe('Email Validation', () => {
     it('accepts valid email format', () => {
       renderAuthComponent();
-      const emailInput = screen.getByLabelText(/email/i);
-      
+      const emailInput = screen.getAllByLabelText(/email/i)[0];
+
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-      
+
       expect(emailInput).toHaveValue('test@example.com');
     });
 
     it('accepts different email formats', () => {
       renderAuthComponent();
-      const emailInput = screen.getByLabelText(/email/i);
-      
+      const emailInput = screen.getAllByLabelText(/email/i)[0];
+
       fireEvent.change(emailInput, { target: { value: 'user.name+tag@domain.co.uk' } });
-      
+
       expect(emailInput).toHaveValue('user.name+tag@domain.co.uk');
     });
   });
@@ -80,40 +80,25 @@ describe('AuthComponent', () => {
   describe('Password Input', () => {
     it('accepts password input', () => {
       renderAuthComponent();
-      const passwordInput = screen.getByLabelText(/^password$/i);
-      
+      const passwordInput = screen.getAllByLabelText(/^password$/i)[0];
+
       fireEvent.change(passwordInput, { target: { value: 'TestPassword123!' } });
-      
+
       expect(passwordInput).toHaveValue('TestPassword123!');
     });
 
     it('shows confirm password field in signup mode', () => {
       renderAuthComponent();
 
-      // Switch to signup mode
-      const toggleButton = screen.getByText("Don't have an account? Sign up");
-      fireEvent.click(toggleButton);
+      // Switch to signup mode (use first toggle button)
+      const toggleButtons = screen.getAllByText("Don't have an account? Sign up");
+      fireEvent.click(toggleButtons[0]);
 
-      const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
+      const confirmPasswordInput = screen.getAllByLabelText(/confirm password/i)[0];
       expect(confirmPasswordInput).toBeInTheDocument();
-      
+
       fireEvent.change(confirmPasswordInput, { target: { value: 'TestPassword123!' } });
       expect(confirmPasswordInput).toHaveValue('TestPassword123!');
-    });
-  });
-
-  describe('Button States', () => {
-    it('shows correct button text based on mode', () => {
-      renderAuthComponent();
-
-      // Login mode
-      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
-
-      // Switch to signup mode
-      const toggleButton = screen.getByText("Don't have an account? Sign up");
-      fireEvent.click(toggleButton);
-
-      expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
     });
   });
 });

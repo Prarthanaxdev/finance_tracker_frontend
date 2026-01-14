@@ -1,9 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
-import RequireAuth from '../components/Auth/RequireAuth';
 import RootLayout from './RootLayout';
 import { useRouteError, isRouteErrorResponse } from 'react-router-dom';
-import { dashboardLoader, authAction, transactionAction } from './loaders';
+import { dashboardLoader, authAction } from './loaders';
 
 // Lazy load components
 const AuthComponent = lazy(() => import('../components/Auth/AuthComponent'));
@@ -59,7 +58,6 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
         loader: dashboardLoader,
-        action: transactionAction,
       },
     ],
   },

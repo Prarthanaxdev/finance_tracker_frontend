@@ -1,13 +1,11 @@
 import { Pie } from "react-chartjs-2";
 import { Box } from "@mui/material";
 import "../Charts/ChartSetup";
-import { useLoaderData, useRevalidator } from "react-router-dom";
-import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useLoaderData } from "react-router-dom";
 import {
   CategoryBreakdownItem,
-} from "../../api/getCategoryBreakdown";
-import { CHART_COLORS, CHART_BORDER_COLORS } from "../../utils/common";
+} from "../../../api/getCategoryBreakdown";
+import { getChartColors, getChartBorderColors } from "../../../utils/common";
 
 interface CategoryExpense {
   name: string;
@@ -18,18 +16,6 @@ const ExpenseBreakdown = () => {
   const { categoryBreakdown } = useLoaderData() as {
     categoryBreakdown: { data: CategoryBreakdownItem[] };
   };
-  const revalidator = useRevalidator();
-  const refreshVersion = useSelector((state: any) => state.refreshVersion.refreshVersion);
-  const prevRefreshVersionRef = useRef(refreshVersion);
-
-  // Revalidate loader data when refreshVersion changes
-  useEffect(() => {
-    if (refreshVersion !== prevRefreshVersionRef.current) {
-      prevRefreshVersionRef.current = refreshVersion;
-      revalidator.revalidate();
-    }
-  }, [refreshVersion, revalidator]);
-
   const breakdown = categoryBreakdown?.data ?? [];
 
   if (breakdown.length === 0) {
@@ -56,8 +42,8 @@ const ExpenseBreakdown = () => {
   const labels = categoryData.map((item) => item.name);
   const data = categoryData.map((item) => item.amount);
 
-  const colors = CHART_COLORS;
-  const borderColors = CHART_BORDER_COLORS;
+  const colors = getChartColors(labels.length);
+  const borderColors = getChartBorderColors(labels.length);
 
   const chartData = {
     labels,
@@ -65,8 +51,8 @@ const ExpenseBreakdown = () => {
       {
         label: "Expenses by Category",
         data,
-        backgroundColor: colors.slice(0, labels.length),
-        borderColor: borderColors.slice(0, labels.length),
+        backgroundColor: colors,
+        borderColor: borderColors,
         borderWidth: 2,
       },
     ],

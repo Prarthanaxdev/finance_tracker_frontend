@@ -1,11 +1,23 @@
+import { useEffect, useRef } from "react";
 import { Box, Paper, Typography } from "@mui/material";
+import { useRevalidator } from "react-router-dom";
+import { useSelector } from "react-redux";
 import ExpenseBreakdown from "./ExpenseBreakdown";
 import MonthlySummary from "./MonthlySummary";
-interface ChartLayoutProps {
-  onTransactionSaved?: () => void;
-}
 
-const ChartLayout = ({ onTransactionSaved }: ChartLayoutProps) => {
+const ChartLayout = () => {
+  const revalidator = useRevalidator();
+  const refreshVersion = useSelector((state: any) => state.refreshVersion.refreshVersion);
+  const prevRefreshVersionRef = useRef(refreshVersion);
+
+  // Revalidate loader data when refreshVersion changes
+  useEffect(() => {
+    if (refreshVersion !== prevRefreshVersionRef.current) {
+      prevRefreshVersionRef.current = refreshVersion;
+      revalidator.revalidate();
+    }
+  }, [refreshVersion, revalidator]);
+
   return (
     <Box
       sx={{
@@ -56,7 +68,6 @@ const ChartLayout = ({ onTransactionSaved }: ChartLayoutProps) => {
         <Typography variant="h6" sx={{ color: "#fff", mb: 2 }}>
           Monthly Overview
         </Typography>
-        {/* Chart will go here */}
         <Box
           sx={{
             flex: 1,

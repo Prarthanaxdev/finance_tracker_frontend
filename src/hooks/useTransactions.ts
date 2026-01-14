@@ -20,7 +20,7 @@ export function useTransactions() {
   const token = getAuthToken() || undefined;
 
   const loadTransactions = useCallback(
-    async (limit = 50, offset = 0, type?: TransactionType) => {
+    async (limit = 5, offset = 0, type?: TransactionType) => {
       setLoading(true);
       setError(null);
       try {
@@ -61,7 +61,7 @@ export function useTransactions() {
           editingId: editingId || null,
         });
         // Refresh list after save
-        await loadTransactions(50, 0, type);
+        await loadTransactions(5, 0, type);
         return message;
       } catch (e: any) {
         const msg = e?.message || 'Failed to save transaction';
@@ -84,7 +84,7 @@ export function useTransactions() {
         }
         await removeTransaction(token, id);
         // Refresh list after delete (keep currentType)
-        await loadTransactions(50, 0, currentType);
+        await loadTransactions(5, 0, currentType);
       } catch (e: any) {
         const msg = e?.message || 'Failed to delete transaction';
         setError(msg);

@@ -2,7 +2,7 @@ import { Bar } from 'react-chartjs-2';
 import { Box, Typography } from '@mui/material';
 import '../Charts/ChartSetup';
 import { useLoaderData } from 'react-router-dom';
-import { MonthlyTrendItem } from '../../api/getMonthlyTrend';
+import { MonthlyTrendItem } from '../../../api/getMonthlyTrend';
 
 const MonthlySummary = () => {
   const { monthlyTrends } = useLoaderData() as {

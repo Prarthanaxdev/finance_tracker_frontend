@@ -4,7 +4,7 @@ import { useLoaderData } from 'react-router-dom';
 import HeaderComponent from './Header';
 import './Dashboard.scss';
 const TabComponent = lazy(() => import('./Tabs/TabComponent'));
-const ChartLayout = lazy(() => import('../Charts/ChartLayout'));
+const ChartLayout = lazy(() => import('./Charts/ChartLayout'));
 const SummaryCards = lazy(() => import('./SummaryCards'));
 
 const DashboardComponent = () => {
@@ -13,17 +13,6 @@ const DashboardComponent = () => {
     monthlyTrends: any;
     categoryBreakdown: any;
   };
-
-  console.log('Dashboard data:', { summary, monthlyTrends, categoryBreakdown });
-
-  if (!summary || !summary.data) {
-    return (
-      <Container maxWidth="xl" sx={{ mt: 3 }}>
-        <h1>Dashboard</h1>
-        <div>Loading dashboard data...</div>
-      </Container>
-    );
-  }
 
   return (
     <>

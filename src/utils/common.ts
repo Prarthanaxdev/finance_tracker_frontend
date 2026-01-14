@@ -18,6 +18,7 @@ export const getAuthToken = (): string | null => {
 };
 
 // Shared color palettes for charts
+
 export const CHART_COLORS = [
   "rgba(255, 99, 132, 0.7)",
   "rgba(54, 162, 235, 0.7)",
@@ -39,3 +40,36 @@ export const CHART_BORDER_COLORS = [
   "rgba(255, 99, 71, 1)",
   "rgba(106, 90, 205, 1)",
 ];
+
+// Utility to generate more colors if needed
+function generateColor(index: number, alpha: number = 0.7) {
+  // Generate HSL color evenly spaced around the color wheel
+  const hue = (index * 137.508) % 360; // use golden angle for good distribution
+  return `hsla(${hue}, 65%, 60%, ${alpha})`;
+}
+
+export function getChartColors(count: number, alpha: number = 0.7) {
+  const base = CHART_COLORS.slice();
+  const colors = [];
+  for (let i = 0; i < count; i++) {
+    if (i < base.length) {
+      colors.push(base[i]);
+    } else {
+      colors.push(generateColor(i, alpha));
+    }
+  }
+  return colors;
+}
+
+export function getChartBorderColors(count: number) {
+  const base = CHART_BORDER_COLORS.slice();
+  const colors = [];
+  for (let i = 0; i < count; i++) {
+    if (i < base.length) {
+      colors.push(base[i]);
+    } else {
+      colors.push(generateColor(i, 1));
+    }
+  }
+  return colors;
+}
